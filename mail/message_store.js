@@ -14,7 +14,7 @@ if(!messages){
   };
 }
 
-function Message(from, to, subject, body){
+function Message(from="", to="", subject="", body=""){
   this.from = from;
   this.to = to;
   this.subject = subject;
