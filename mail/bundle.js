@@ -46,10 +46,12 @@
 
 	const Router = __webpack_require__(1);
 	const Inbox = __webpack_require__(2);
+	const Sent = __webpack_require__(4);
 
 	document.addEventListener('DOMContentLoaded', () => {
 	  let routes = {
-	    inbox: Inbox
+	    inbox: Inbox,
+	    sent: Sent
 	  };
 
 	  let content = document.querySelector('.content');
@@ -57,7 +59,7 @@
 	  router.start();
 	  window.location.hash = "#inbox";
 
-	   
+
 	  let lis = document.querySelectorAll('.sidebar-nav li');
 
 	  for (let i = 0; i< lis.length; i++) {
@@ -164,6 +166,41 @@
 	MessageStore.getSentMessages = function(){return messages.sent;}
 
 	module.exports = MessageStore;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const MessageStore = __webpack_require__(3);
+
+	let Sent = {};
+
+	Sent.render = function(){
+	  let node = document.createElement('ul');
+	  let allMessages = MessageStore.getSentMessages();
+	  node.className = "messages";
+	  allMessages.forEach(message=>{
+	    let rendered = this.renderMessage(message);
+	    node.appendChild(rendered);
+	  });
+	  return node;
+	};
+
+	Sent.renderMessage = function(message){
+
+	  let newLi = document.createElement("li");
+	    newLi.className = "message";
+	    newLi.innerHTML =`
+	    <span class='to'>${message.to}</span>
+	    <span class="subject">${message.subject}</span> -
+	    <span class="body">${message.body}</span>
+	    `;
+	    return newLi;
+	};
+
+
+	module.exports = Sent;
 
 
 /***/ }
