@@ -9,7 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let content = document.querySelector('.content');
   let router = new Router(content, routes);
   router.start();
+  window.location.hash = "#inbox";
 
+   
   let lis = document.querySelectorAll('.sidebar-nav li');
 
   for (let i = 0; i< lis.length; i++) {

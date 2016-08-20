@@ -55,7 +55,9 @@
 	  let content = document.querySelector('.content');
 	  let router = new Router(content, routes);
 	  router.start();
+	  window.location.hash = "#inbox";
 
+	   
 	  let lis = document.querySelectorAll('.sidebar-nav li');
 
 	  for (let i = 0; i< lis.length; i++) {
@@ -106,19 +108,62 @@
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	const MessageStore = __webpack_require__(3);
 
 	let Inbox = {};
 
 	Inbox.render = function(){
 	  let node = document.createElement('ul');
+	  let allMessages = MessageStore.getInboxMessages();
 	  node.className = "messages";
-	  node.innerHTML = "An Inbox Message";
+	  allMessages.forEach(message=>{
+	    let rendered = this.renderMessage(message);
+	    node.appendChild(rendered);
+	  });
+	  // node.innerHTML = "An Inbox Message";
 	  return node;
+	};
+
+	Inbox.renderMessage = function(message){
+
+	  let newLi = document.createElement("li");
+	    newLi.className = "message";
+	    newLi.innerHTML =`
+	    <span class='from'>${message.from}</span>
+	    <span class="subject">${message.subject}</span> -
+	    <span class="body">${message.body}</span>
+	    `;
+	    return newLi;
 	};
 
 
 	module.exports = Inbox;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	let messages = {
+	  sent: [
+	    {to: "friend@mail.com", subject: "Check this out", body: "It's so cool"},
+	    {to: "person@mail.com", subject: "zzz", body: "so booring"}
+	  ],
+	  inbox: [
+	    {from: "grandma@mail.com", subject: "Fwd: Fwd: Fwd: Check this out", body:
+	"Stay at home mom discovers cure for leg cramps. Doctors hate her"},
+	  {from: "person@mail.com", subject: "Questionnaire", body: "Take this free quiz win $1000 dollars"}
+	]
+	};
+
+
+	let MessageStore = {};
+	MessageStore.getInboxMessages = function(){return messages.inbox;}
+	MessageStore.getSentMessages = function(){return messages.sent;}
+
+	module.exports = MessageStore;
 
 
 /***/ }
