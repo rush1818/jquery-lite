@@ -47,11 +47,13 @@
 	const Router = __webpack_require__(1);
 	const Inbox = __webpack_require__(2);
 	const Sent = __webpack_require__(4);
+	const Compose = __webpack_require__(5);
 
 	document.addEventListener('DOMContentLoaded', () => {
 	  let routes = {
 	    inbox: Inbox,
-	    sent: Sent
+	    sent: Sent,
+	    compose: Compose
 	  };
 
 	  let content = document.querySelector('.content');
@@ -148,7 +150,10 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	let messages = {
+	let messages = JSON.parse(localStorage.getItem('messages'));
+
+	if(!messages){
+	 messages = {
 	  sent: [
 	    {to: "friend@mail.com", subject: "Check this out", body: "It's so cool"},
 	    {to: "person@mail.com", subject: "zzz", body: "so booring"}
@@ -157,13 +162,34 @@
 	    {from: "grandma@mail.com", subject: "Fwd: Fwd: Fwd: Check this out", body:
 	"Stay at home mom discovers cure for leg cramps. Doctors hate her"},
 	  {from: "person@mail.com", subject: "Questionnaire", body: "Take this free quiz win $1000 dollars"}
-	]
-	};
+	  ]
+	  };
+	}
 
+	function Message(from, to, subject, body){
+	  this.from = from;
+	  this.to = to;
+	  this.subject = subject;
+	  this.body = body;
+	}
+
+	let messageDraft = new Message();
 
 	let MessageStore = {};
-	MessageStore.getInboxMessages = function(){return messages.inbox;}
-	MessageStore.getSentMessages = function(){return messages.sent;}
+	MessageStore.getInboxMessages = function(){return messages.inbox;};
+	MessageStore.getSentMessages = function(){return messages.sent;};
+	MessageStore.updateDraftField = function(field, value){
+	  messageDraft[field] = value;
+	};
+
+	MessageStore.sendDraft = function() {
+	  messages.sent.push(messageDraft);
+	  messageDraft = new Message();
+	  localStorage.setItem('messages', JSON.stringify(messages));
+	},
+	MessageStore.getMessageDraft = function(){
+	  return messageDraft;
+	};
 
 	module.exports = MessageStore;
 
@@ -201,6 +227,60 @@
 
 
 	module.exports = Sent;
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	const MessageStore = __webpack_require__(3);
+
+	let Compose = {};
+
+	Compose.render = function(){
+	  let node = document.createElement('div');
+	  node.className = "new-message";
+	  node.innerHTML = this.renderMessage();
+	  node.addEventListener('change', e => {
+	      let target = e.target;
+	      MessageStore.updateDraftField(target.name, target.value);
+	    });
+	  node.addEventListener('submit', e => {
+	    e.preventDefault();
+	    MessageStore.sendDraft();
+	    location.hash = "inbox";
+	  });
+	  // node.innerHTML = "An Compose Message";
+	  return node;
+	};
+
+	Compose.renderMessage = function(){
+	  let message = MessageStore.getMessageDraft();
+
+	  let html = `
+	   <p class="new-message-header">New Message</p>
+	   <form class="compose-form">
+	   <input
+	     placeholder='Recipient'
+	     name='to'
+	     type="text"
+	     value='${message.to}'>
+	   <input
+	     placeholder='Subject'
+	     name='subject'
+	     type="text"
+	     value='${message.subject}'>
+	   <textarea
+	     name='body'
+	     rows='20'>${message.body}</textarea>
+	   <button type="submit" class="btn btn-primary submit-message">Send</button>
+	   </form>
+	   `;
+	    return html;
+	};
+
+
+	module.exports = Compose;
 
 
 /***/ }
